@@ -27,10 +27,14 @@ type GameData struct {
 	debug         bool
 }
 
-const minSpeed = 0
-const maxSpeed = 60
-const frameCount = 4
-const frameOffset = 1
+const (
+	minSpeed    = 0
+	maxSpeed    = 60
+	frameCount  = 4
+	frameOffset = 1
+	gravity     = 2           //units/tick^2
+	halfGravity = gravity / 2 //units/tick^2
+)
 
 func NewGame(width, height, gamespeed int, debug bool) (*GameData, error) {
 	err := assets.LoadAssets()
@@ -50,9 +54,6 @@ func NewGame(width, height, gamespeed int, debug bool) (*GameData, error) {
 	maxVelocity := Vector2{X: 15, Y: -15}
 	return &GameData{width: width, height: height, position: position, maxVelocity: maxVelocity, groundY: groundY, gameSpeed: gamespeed, frame: 1, debug: debug}, nil
 }
-
-const gravity = 2               //units/tick^2
-const halfGravity = gravity / 2 //units/tick^2
 
 func (g *GameData) Draw(screen *ebiten.Image) {
 	screen.Clear()
@@ -115,6 +116,7 @@ func (g *GameData) Update() error {
 
 func (g *GameData) jumpPosition(y0, v0 float64, time int) (int, float64) {
 	//y(t) = y0 + v0*t + (1/2)*g*t^2
+	//v(t) = v0 + g*t
 	yt := y0 + v0*float64(time) + halfGravity*float64(time*time)
 	vt := v0 + gravity*float64(time)
 	if g.debug {
@@ -128,7 +130,7 @@ func (g *GameData) startJump() {
 		fmt.Println("starting jump")
 	}
 	g.jumpTime = 1
-	g.curVelocity.Y = g.maxVelocity.Y
+	g.curVelocity.Y += g.maxVelocity.Y
 }
 
 func (g *GameData) stopJump() {
