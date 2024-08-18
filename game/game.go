@@ -24,6 +24,7 @@ type GameData struct {
 	tickCounter   int
 	gameSpeed     int
 	frame         int
+	debug         bool
 }
 
 const minSpeed = 0
@@ -47,19 +48,11 @@ func NewGame(width, height, gamespeed int, debug bool) (*GameData, error) {
 	groundY := height - 50
 	position := image.Point{X: width / 2, Y: groundY}
 	maxVelocity := Vector2{X: 15, Y: -15}
-	return &GameData{width: width, height: height, position: position, maxVelocity: maxVelocity, groundY: groundY, gameSpeed: gamespeed, frame: 1}, nil
+	return &GameData{width: width, height: height, position: position, maxVelocity: maxVelocity, groundY: groundY, gameSpeed: gamespeed, frame: 1, debug: debug}, nil
 }
 
 const gravity = 2               //units/tick^2
 const halfGravity = gravity / 2 //units/tick^2
-
-func jumpPosition(y0, v0 float64, time int) (int, float64) {
-	//y(t) = y0 + v0*t + (1/2)*g*t^2
-	yt := y0 + v0*float64(time) + halfGravity*float64(time*time)
-	vt := v0 + gravity*float64(time)
-	fmt.Printf("y0 = %f, v0 = %f, yt = %f, vt = %f, time = %d\n", y0, v0, yt, vt, time)
-	return int(math.Round(yt)), vt
-}
 
 func (g *GameData) Draw(screen *ebiten.Image) {
 	screen.Clear()
@@ -78,7 +71,9 @@ func (g *GameData) Draw(screen *ebiten.Image) {
 	opts.GeoM.Translate(float64(g.width/2)-float64(rover.Bounds().Dx()/2)*scale, float64(g.position.Y)-float64(rover.Bounds().Dy()/2)*scale)
 	screen.DrawImage(rover, opts)
 
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("jump time: %d\njumping %v", g.jumpTime, g.isJumping()))
+	if g.debug {
+		ebitenutil.DebugPrint(screen, fmt.Sprintf("jump time: %d\njumping %v", g.jumpTime, g.isJumping()))
+	}
 }
 
 func (g *GameData) Update() error {
@@ -105,7 +100,7 @@ func (g *GameData) Update() error {
 			g.frame++
 		}
 		if g.isJumping() {
-			g.position.Y, g.curVelocity.Y = jumpPosition(float64(g.position.Y), g.curVelocity.Y, g.jumpTime)
+			g.position.Y, g.curVelocity.Y = g.jumpPosition(float64(g.position.Y), g.curVelocity.Y, g.jumpTime)
 			g.jumpTime++
 			if g.position.Y >= g.groundY {
 				g.stopJump()
@@ -118,14 +113,28 @@ func (g *GameData) Update() error {
 	return nil
 }
 
+func (g *GameData) jumpPosition(y0, v0 float64, time int) (int, float64) {
+	//y(t) = y0 + v0*t + (1/2)*g*t^2
+	yt := y0 + v0*float64(time) + halfGravity*float64(time*time)
+	vt := v0 + gravity*float64(time)
+	if g.debug {
+		fmt.Printf("y0 = %f, v0 = %f, yt = %f, vt = %f, time = %d\n", y0, v0, yt, vt, time)
+	}
+	return int(math.Round(yt)), vt
+}
+
 func (g *GameData) startJump() {
-	fmt.Println("starting jump")
+	if g.debug {
+		fmt.Println("starting jump")
+	}
 	g.jumpTime = 1
 	g.curVelocity.Y = g.maxVelocity.Y
 }
 
 func (g *GameData) stopJump() {
-	fmt.Println("stopping jump")
+	if g.debug {
+		fmt.Println("stopping jump")
+	}
 	g.jumpTime = 0
 	g.curVelocity.Y = 0
 	g.position.Y = g.groundY
