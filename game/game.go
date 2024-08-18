@@ -25,6 +25,7 @@ type GameData struct {
 	gameSpeed     int
 	frame         int
 	debug         bool
+	direction     float64
 }
 
 const (
@@ -52,7 +53,7 @@ func NewGame(width, height, gamespeed int, debug bool) (*GameData, error) {
 	groundY := height - 50
 	position := image.Point{X: width / 2, Y: groundY}
 	maxVelocity := Vector2{X: 15, Y: -15}
-	return &GameData{width: width, height: height, position: position, maxVelocity: maxVelocity, groundY: groundY, gameSpeed: gamespeed, frame: 1, debug: debug}, nil
+	return &GameData{width: width, height: height, position: position, maxVelocity: maxVelocity, groundY: groundY, gameSpeed: gamespeed, frame: 1, debug: debug, direction: 1}, nil
 }
 
 func (g *GameData) Draw(screen *ebiten.Image) {
@@ -60,6 +61,7 @@ func (g *GameData) Draw(screen *ebiten.Image) {
 
 	background := assets.GetImage("backgroundH")
 	opts := &ebiten.DrawImageOptions{}
+	// TODO fix going left and running out of background image
 	opts.GeoM.Translate(-float64(g.position.X%g.width), 0)
 	screen.DrawImage(background, opts)
 	opts.GeoM.Translate(float64(g.width), 0)
@@ -68,7 +70,8 @@ func (g *GameData) Draw(screen *ebiten.Image) {
 	rover := assets.GetImage(fmt.Sprintf("rover%d", g.frame%frameCount+frameOffset))
 	opts = &ebiten.DrawImageOptions{}
 	scale := 0.5
-	opts.GeoM.Scale(scale, scale)
+	// TODO fix direction translation point
+	opts.GeoM.Scale(scale*g.direction, scale)
 	opts.GeoM.Translate(float64(g.width/2)-float64(rover.Bounds().Dx()/2)*scale, float64(g.position.Y)-float64(rover.Bounds().Dy()/2)*scale)
 	screen.DrawImage(rover, opts)
 
@@ -87,9 +90,11 @@ func (g *GameData) Update() error {
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
 		g.curVelocity.X = -g.maxVelocity.X
+		g.direction = -1
 
 	} else if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
 		g.curVelocity.X = g.maxVelocity.X
+		g.direction = 1
 	} else {
 		g.curVelocity.X = 0
 	}
