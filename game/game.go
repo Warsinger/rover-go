@@ -17,17 +17,17 @@ type Vector2 struct {
 	X, Y float64
 }
 type GameData struct {
-	width, height int
-	position      image.Point
-	curVelocity   Vector2
-	maxVelocity   Vector2
-	jumpTime      int
-	groundY       int
-	tickCounter   int
-	gameSpeed     int
-	frame         int
-	debug         bool
-	direction     float64
+	width, height       int
+	oldwidth, oldheight int
+	jumpTime            int
+	tickCounter         int
+	gameSpeed           int
+	frame               int
+	debug               bool
+	direction           float64
+	position            image.Point
+	curVelocity         Vector2
+	maxVelocity         Vector2
 }
 
 const (
@@ -37,6 +37,7 @@ const (
 	frameOffset = 1
 	gravity     = 2           //units/tick^2
 	halfGravity = gravity / 2 //units/tick^2
+	groundLevel = 75
 )
 
 func NewGame(width, height, gamespeed int, debug bool) (*GameData, error) {
@@ -52,18 +53,21 @@ func NewGame(width, height, gamespeed int, debug bool) (*GameData, error) {
 	}
 
 	ebiten.SetWindowTitle("Rover")
-	groundY := height - 50
-	position := image.Point{X: width / 2, Y: groundY}
+	ebiten.SetWindowSize(width, height)
+	position := image.Point{X: width / 2, Y: 100}
 	maxVelocity := Vector2{X: 15, Y: -15}
-	return &GameData{width: width, height: height, position: position, maxVelocity: maxVelocity, groundY: groundY, gameSpeed: gamespeed, frame: 1, debug: debug, direction: 1}, nil
+	return &GameData{width: width, height: height, position: position, maxVelocity: maxVelocity, gameSpeed: gamespeed, frame: 1, debug: debug, direction: 1}, nil
 }
 
 func (g *GameData) Draw(screen *ebiten.Image) {
 	screen.Clear()
 
 	background := assets.GetImage("backgroundH")
+	bgScaleX := float64(g.width) / float64(background.Bounds().Dx())
+	bgScaleY := float64(g.height) / float64(background.Bounds().Dy())
 	opts := &ebiten.DrawImageOptions{}
-	var drawPosition1 float64 = -float64(g.position.X % g.width)
+	opts.GeoM.Scale(bgScaleX, bgScaleY)
+	var drawPosition1 float64 = -float64(g.position.X % int(float64(g.width)))
 	if g.position.X < 0 {
 		drawPosition1 -= float64(g.width)
 	}
@@ -82,6 +86,7 @@ func (g *GameData) Draw(screen *ebiten.Image) {
 	if g.debug {
 		ebitenutil.DebugPrint(screen, fmt.Sprintf("jump time: %d\njumping %v", g.jumpTime, g.isJumping()))
 		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("x, y %d, %d", g.position.X, g.position.Y), g.width/2, 0)
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("xscale, yscale %f, %f", bgScaleX, bgScaleY), g.width/2, 50)
 
 		vector.StrokeCircle(screen, float32(g.width/2), float32(g.position.Y), 2, 2, color.RGBA{255, 0, 0, 255}, true)
 		vector.StrokeCircle(screen, float32(g.position.X), float32(g.position.Y), 2, 2, color.RGBA{0, 0, 255, 255}, true)
@@ -92,6 +97,24 @@ func (g *GameData) Draw(screen *ebiten.Image) {
 func (g *GameData) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyQ) {
 		return ebiten.Termination
+	}
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
+		g.debug = !g.debug
+	}
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
+		ebiten.SetFullscreen(!ebiten.IsFullscreen())
+		if !ebiten.IsFullscreen() {
+			g.width = g.oldwidth
+			g.height = g.oldheight
+			ebiten.SetWindowSize(g.width, g.height)
+		} else {
+			g.oldwidth = g.width
+			g.oldheight = g.height
+			g.width, g.height = ebiten.Monitor().Size()
+		}
+
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
@@ -114,12 +137,14 @@ func (g *GameData) Update() error {
 		if g.isMoving() {
 			g.frame++
 		}
-		if g.isJumping() {
+		if g.isJumping() || g.isAirborne() {
 			g.position.Y, g.curVelocity.Y = g.jumpPosition(float64(g.position.Y), g.curVelocity.Y, g.jumpTime)
 			g.jumpTime++
-			if g.position.Y >= g.groundY {
+			if g.position.Y >= g.groundY() {
 				g.stopJump()
 			}
+		} else if g.position.Y > g.groundY() {
+			g.position.Y = g.groundY()
 		}
 	} else {
 		g.tickCounter++
@@ -153,10 +178,14 @@ func (g *GameData) stopJump() {
 	}
 	g.jumpTime = 0
 	g.curVelocity.Y = 0
-	g.position.Y = g.groundY
+	g.position.Y = g.groundY()
 }
 func (g *GameData) isJumping() bool {
 	return g.jumpTime > 0
+}
+
+func (g *GameData) isAirborne() bool {
+	return g.position.Y < g.groundY()
 }
 
 func (g *GameData) isMoving() bool {
@@ -165,4 +194,8 @@ func (g *GameData) isMoving() bool {
 
 func (g *GameData) Layout(width, height int) (int, int) {
 	return g.width, g.height
+}
+
+func (g *GameData) groundY() int {
+	return g.height - groundLevel
 }
