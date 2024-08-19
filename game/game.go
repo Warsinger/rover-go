@@ -87,14 +87,17 @@ func (g *GameData) Draw(screen *ebiten.Image) {
 
 	if g.isMoving() {
 		// draw raocket blast out the end of the rover
-		// TODO angle if jumping
-		const flameLength = 15
+		var flameLength float64 = 15
 		const yoffset = -15
-		vector.StrokeLine(screen, float32(xmin+g.direction*(flameLength-4)), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)-4+yoffset, float32(xmin), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)-4+yoffset, 2, color.RGBA{255, 165, 0, 255}, false)
-		vector.StrokeLine(screen, float32(xmin+g.direction*(flameLength-2)), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)-2+yoffset, float32(xmin), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)-2+yoffset, 2, color.RGBA{255, 255, 0, 255}, false)
-		vector.StrokeLine(screen, float32(xmin+g.direction*(flameLength)), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+yoffset, float32(xmin), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+yoffset, 2, color.RGBA{255, 0, 0, 255}, false)
-		vector.StrokeLine(screen, float32(xmin+g.direction*(flameLength-2)), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+2+yoffset, float32(xmin), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+2+yoffset, 2, color.RGBA{255, 255, 0, 255}, false)
-		vector.StrokeLine(screen, float32(xmin+g.direction*(flameLength-4)), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+4+yoffset, float32(xmin), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+4+yoffset, 2, color.RGBA{255, 165, 0, 255}, false)
+		var yangleOffset float32 = 0
+		if g.isJumping() {
+			yangleOffset = 10
+		}
+		vector.StrokeLine(screen, float32(xmin+g.direction*(flameLength-4)), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)-4+yoffset, float32(xmin), yangleOffset+float32(ymin+float64(rover.Bounds().Dy()/2)*scale)-4+yoffset, 2, color.RGBA{255, 165, 0, 255}, false)
+		vector.StrokeLine(screen, float32(xmin+g.direction*(flameLength-2)), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)-2+yoffset, float32(xmin), yangleOffset+float32(ymin+float64(rover.Bounds().Dy()/2)*scale)-2+yoffset, 2, color.RGBA{255, 255, 0, 255}, false)
+		vector.StrokeLine(screen, float32(xmin+g.direction*(flameLength)), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+yoffset, float32(xmin), yangleOffset+float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+yoffset, 2, color.RGBA{255, 0, 0, 255}, false)
+		vector.StrokeLine(screen, float32(xmin+g.direction*(flameLength-2)), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+2+yoffset, float32(xmin), yangleOffset+float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+2+yoffset, 2, color.RGBA{255, 255, 0, 255}, false)
+		vector.StrokeLine(screen, float32(xmin+g.direction*(flameLength-4)), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+4+yoffset, float32(xmin), yangleOffset+float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+4+yoffset, 2, color.RGBA{255, 165, 0, 255}, false)
 	}
 
 	if g.debug {

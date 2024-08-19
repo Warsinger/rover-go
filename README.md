@@ -25,8 +25,9 @@ Graphics by Matt. Nathan created the Lego builds that were used for the assets.
 ## TODO
 
 * Implement max jump height
+  * fuel that runs out and requires recharge with item pickup or time
 * Graphics
-  * fire rockets on jump
+  * ~~fire rockets on jump~~
   * ~~flip vehicle direction~~
   * ~~scale background~~
 * Obstacles
