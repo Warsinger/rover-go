@@ -80,12 +80,26 @@ func (g *GameData) Draw(screen *ebiten.Image) {
 	opts = &ebiten.DrawImageOptions{}
 	scale := 0.5
 	opts.GeoM.Scale(scale*g.direction, scale)
-	opts.GeoM.Translate(float64(g.width/2)-g.direction*float64(rover.Bounds().Dx()/2)*scale, float64(g.position.Y)-float64(rover.Bounds().Dy()/2)*scale)
+	xmin := float64(g.width/2) - g.direction*float64(rover.Bounds().Dx()/2)*scale
+	ymin := float64(g.position.Y) - float64(rover.Bounds().Dy()/2)*scale
+	opts.GeoM.Translate(xmin, ymin)
 	screen.DrawImage(rover, opts)
+
+	if g.isMoving() {
+		// draw raocket blast out the end of the rover
+		// TODO angle if jumping
+		const flameLength = 15
+		const yoffset = -15
+		vector.StrokeLine(screen, float32(xmin+g.direction*(flameLength-4)), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)-4+yoffset, float32(xmin), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)-4+yoffset, 2, color.RGBA{255, 165, 0, 255}, false)
+		vector.StrokeLine(screen, float32(xmin+g.direction*(flameLength-2)), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)-2+yoffset, float32(xmin), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)-2+yoffset, 2, color.RGBA{255, 255, 0, 255}, false)
+		vector.StrokeLine(screen, float32(xmin+g.direction*(flameLength)), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+yoffset, float32(xmin), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+yoffset, 2, color.RGBA{255, 0, 0, 255}, false)
+		vector.StrokeLine(screen, float32(xmin+g.direction*(flameLength-2)), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+2+yoffset, float32(xmin), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+2+yoffset, 2, color.RGBA{255, 255, 0, 255}, false)
+		vector.StrokeLine(screen, float32(xmin+g.direction*(flameLength-4)), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+4+yoffset, float32(xmin), float32(ymin+float64(rover.Bounds().Dy()/2)*scale)+4+yoffset, 2, color.RGBA{255, 165, 0, 255}, false)
+	}
 
 	if g.debug {
 		ebitenutil.DebugPrint(screen, fmt.Sprintf("jump time: %d\njumping %v\ngame speed %d", g.jumpTime, g.isJumping(), g.gameSpeed))
-		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("x, y %d, %d\nxscale, yscale %f, %f", g.position.X, g.position.Y, bgScaleX, bgScaleY), g.width/2, 0)
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("x, y %d, %d\nxscale, yscale %f, %f\nxmin, ymin %f, %f", g.position.X, g.position.Y, bgScaleX, bgScaleY, xmin, ymin), g.width/2, 0)
 
 		vector.StrokeCircle(screen, float32(g.width/2), float32(g.position.Y), 2, 2, color.RGBA{255, 0, 0, 255}, true)
 		vector.StrokeCircle(screen, float32(g.position.X), float32(g.position.Y), 2, 2, color.RGBA{0, 0, 255, 255}, true)
