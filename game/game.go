@@ -84,9 +84,8 @@ func (g *GameData) Draw(screen *ebiten.Image) {
 	screen.DrawImage(rover, opts)
 
 	if g.debug {
-		ebitenutil.DebugPrint(screen, fmt.Sprintf("jump time: %d\njumping %v", g.jumpTime, g.isJumping()))
-		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("x, y %d, %d", g.position.X, g.position.Y), g.width/2, 0)
-		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("xscale, yscale %f, %f", bgScaleX, bgScaleY), g.width/2, 50)
+		ebitenutil.DebugPrint(screen, fmt.Sprintf("jump time: %d\njumping %v\ngame speed %d", g.jumpTime, g.isJumping(), g.gameSpeed))
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("x, y %d, %d\nxscale, yscale %f, %f", g.position.X, g.position.Y, bgScaleX, bgScaleY), g.width/2, 0)
 
 		vector.StrokeCircle(screen, float32(g.width/2), float32(g.position.Y), 2, 2, color.RGBA{255, 0, 0, 255}, true)
 		vector.StrokeCircle(screen, float32(g.position.X), float32(g.position.Y), 2, 2, color.RGBA{0, 0, 255, 255}, true)
@@ -114,7 +113,13 @@ func (g *GameData) Update() error {
 			g.oldheight = g.height
 			g.width, g.height = ebiten.Monitor().Size()
 		}
+	}
 
+	if inpututil.IsKeyJustPressed(ebiten.KeyEqual) {
+		g.gameSpeed = (min(g.gameSpeed+5, maxSpeed))
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyMinus) {
+		g.gameSpeed = (max(g.gameSpeed-5, minSpeed))
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
@@ -193,6 +198,8 @@ func (g *GameData) isMoving() bool {
 }
 
 func (g *GameData) Layout(width, height int) (int, int) {
+	g.width = width
+	g.height = height
 	return g.width, g.height
 }
 
