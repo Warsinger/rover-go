@@ -63,11 +63,9 @@ func (g *GameData) Draw(screen *ebiten.Image) {
 
 	background := assets.GetImage("backgroundH")
 	opts := &ebiten.DrawImageOptions{}
-	var drawPosition1 float64
-	if g.position.X >= 0 {
-		drawPosition1 = -float64(g.position.X % g.width)
-	} else {
-		drawPosition1 = -float64(g.width + g.position.X%g.width)
+	var drawPosition1 float64 = -float64(g.position.X % g.width)
+	if g.position.X < 0 {
+		drawPosition1 -= float64(g.width)
 	}
 	opts.GeoM.Translate(drawPosition1, 0)
 	screen.DrawImage(background, opts)
