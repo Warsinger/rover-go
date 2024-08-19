@@ -3,12 +3,14 @@ package game
 import (
 	"fmt"
 	"image"
+	"image/color"
 	"math"
 	"rover/assets"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type Vector2 struct {
@@ -61,8 +63,13 @@ func (g *GameData) Draw(screen *ebiten.Image) {
 
 	background := assets.GetImage("backgroundH")
 	opts := &ebiten.DrawImageOptions{}
-	// TODO fix going left and running out of background image
-	opts.GeoM.Translate(-float64(g.position.X%g.width), 0)
+	var drawPosition1 float64
+	if g.position.X >= 0 {
+		drawPosition1 = -float64(g.position.X % g.width)
+	} else {
+		drawPosition1 = -float64(g.width + g.position.X%g.width)
+	}
+	opts.GeoM.Translate(drawPosition1, 0)
 	screen.DrawImage(background, opts)
 	opts.GeoM.Translate(float64(g.width), 0)
 	screen.DrawImage(background, opts)
@@ -70,13 +77,17 @@ func (g *GameData) Draw(screen *ebiten.Image) {
 	rover := assets.GetImage(fmt.Sprintf("rover%d", g.frame%frameCount+frameOffset))
 	opts = &ebiten.DrawImageOptions{}
 	scale := 0.5
-	// TODO fix direction translation point
 	opts.GeoM.Scale(scale*g.direction, scale)
-	opts.GeoM.Translate(float64(g.width/2)-float64(rover.Bounds().Dx()/2)*scale, float64(g.position.Y)-float64(rover.Bounds().Dy()/2)*scale)
+	opts.GeoM.Translate(float64(g.width/2)-g.direction*float64(rover.Bounds().Dx()/2)*scale, float64(g.position.Y)-float64(rover.Bounds().Dy()/2)*scale)
 	screen.DrawImage(rover, opts)
 
 	if g.debug {
 		ebitenutil.DebugPrint(screen, fmt.Sprintf("jump time: %d\njumping %v", g.jumpTime, g.isJumping()))
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("x, y %d, %d", g.position.X, g.position.Y), g.width/2, 0)
+
+		vector.StrokeCircle(screen, float32(g.width/2), float32(g.position.Y), 2, 2, color.RGBA{255, 0, 0, 255}, true)
+		vector.StrokeCircle(screen, float32(g.position.X), float32(g.position.Y), 2, 2, color.RGBA{0, 0, 255, 255}, true)
+		vector.StrokeRect(screen, float32(g.width/2)-float32(float64(rover.Bounds().Dx()/2)*scale), float32(g.position.Y)-float32(float64(rover.Bounds().Dy()/2)*scale), float32(float64(rover.Bounds().Dx())*scale), float32(float64(rover.Bounds().Dy())*scale), 2, color.RGBA{255, 0, 0, 255}, true)
 	}
 }
 
