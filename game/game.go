@@ -145,11 +145,11 @@ func (g *GameData) Update() error {
 		if g.isJumping() || g.isAirborne() {
 			g.position.Y, g.curVelocity.Y = g.jumpPosition(float64(g.position.Y), g.curVelocity.Y, g.jumpTime)
 			g.jumpTime++
-			if g.position.Y >= g.groundY() {
+			if g.position.Y >= g.groundLevel() {
 				g.stopJump()
 			}
-		} else if g.position.Y > g.groundY() {
-			g.position.Y = g.groundY()
+		} else if g.position.Y > g.groundLevel() {
+			g.position.Y = g.groundLevel()
 		}
 	} else {
 		g.tickCounter++
@@ -183,14 +183,14 @@ func (g *GameData) stopJump() {
 	}
 	g.jumpTime = 0
 	g.curVelocity.Y = 0
-	g.position.Y = g.groundY()
+	g.position.Y = g.groundLevel()
 }
 func (g *GameData) isJumping() bool {
 	return g.jumpTime > 0
 }
 
 func (g *GameData) isAirborne() bool {
-	return g.position.Y < g.groundY()
+	return g.position.Y < g.groundLevel()
 }
 
 func (g *GameData) isMoving() bool {
@@ -203,6 +203,6 @@ func (g *GameData) Layout(width, height int) (int, int) {
 	return g.width, g.height
 }
 
-func (g *GameData) groundY() int {
+func (g *GameData) groundLevel() int {
 	return g.height - groundLevel
 }

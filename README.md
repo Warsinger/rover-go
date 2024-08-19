@@ -27,9 +27,8 @@ Graphics by Matt. Nathan created the Lego builds that were used for the assets.
 * Implement max jump height
 * Graphics
   * fire rockets on jump
-  * flip vehicle direction  
-  * scale background
-  * rotate
+  * ~~flip vehicle direction~~
+  * ~~scale background~~
 * Obstacles
 * Score
 * Objective of the game?
