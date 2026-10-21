@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"rover/game"
+	"rover/internal/platform"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -14,7 +15,9 @@ func main() {
 	speed := flag.Int("speed", 30, "Ticks per second, min 0 max 60, + or - to adjust in game")
 	debug := flag.Bool("debug", false, "Show debug info, D to toggle in game")
 
-	flag.Parse()
+	if err := flag.CommandLine.Parse(platform.Args()); err != nil {
+		log.Fatal(err)
+	}
 
 	g, err := game.NewGame(*width, *height, *speed, *debug)
 	if err != nil {

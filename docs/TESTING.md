@@ -31,7 +31,7 @@ $env:GOARCH = 'wasm'
 try { go build -o build/game.wasm . } finally { Remove-Item Env:GOOS; Remove-Item Env:GOARCH }
 ```
 
-This is a compilation check, not a browser launcher or proof of interactive browser support. Native Linux packages importing Ebitengine also require graphics libraries and a display; use Xvfb when testing those packages on a headless Linux host. See the Ebitengine installation guide linked in README.
+This is the low-level compilation check; the complete browser launcher and browser-specific manual checks are documented in BROWSER.md. Native Linux packages importing Ebitengine also require graphics libraries and a display; use Xvfb when testing those packages on a headless Linux host. See the Ebitengine installation guide linked in README.
 
 ## Automated behavior
 
@@ -41,3 +41,7 @@ Tests cover initial state, left/right precedence, stopping, sprite frame advance
 
 Run go run .; move in both directions and release the keys; jump and boost again midair; land; pause with minus and resume with equals; toggle D; toggle fullscreen with F and restore; resize smaller/larger; verify the background repeats and the rover/flame face correctly; quit with Q. Test invalid width/height/speed and confirm an error. Assets and audio startup still need a real device check. There are embedded sounds, but gameplay currently does not play them.
 
+
+## Browser checks
+
+Run `node --test scripts/*.test.mjs`, `go run ./cmd/web`, and `node scripts/package-pages.mjs <fresh-output-directory>`. CI uploads the complete Pages artifact after these pass. See BROWSER.md for the actual Chromium checks performed and remaining browser/touch coverage limits. Verify settings after restart, initial focus, graceful failed loading, gzip bundle startup, and that the preview URL appears on the PR and in the workflow summary.
