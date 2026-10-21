@@ -1,18 +1,23 @@
 # Rover
 
-A side scrolling game where you drive a rover, jump and avoid obstacles, and other fun things.
+A side-scrolling rover prototype with horizontal movement, a scrolling background and repeated jump boosts. Obstacles, scoring and objectives are planned.
 
 ## Gameplay
 
 ### Movement
 
 * Left and Right arrow keys to move
-* Spacebar to jump, you can jump while in the air to jump hire
+* Spacebar to jump; press again in midair for another boost
+* Equals/plus or minus to adjust nominal speed (0 pauses)
+* D toggle diagnostics
+* F toggle fullscreen
+* Q quit
+* Resize the window to change the viewport
 
 ## Command line options
 
-* `-speed N` Set the general game speed 1 - 60 ticks per second. Default is 30.
-* `-debug` Print some debug information t the screen and the console.
+* `-speed N` Set the general game speed 0 - 60 (0 pauses; the historical tick scheduler makes the rate approximate). Default is 30.
+* `-debug` Print some debug information to the screen and the console.
 * `-width N` Set the width of the screen. Default is 800.
 * `-height N` Set the height of the screen. Default is 600.
 
@@ -54,4 +59,6 @@ A WebAssembly compilation check is also available:
 GOOS=js GOARCH=wasm go build -o build/game.wasm .
 ```
 
-In PowerShell, set `$env:GOOS = "js"` and `$env:GOARCH = "wasm"` before the build, then remove those environment variables afterward. This checks compatibility; the browser launcher and web controls are tracked separately in the web-version issue. There are currently no automated simulation tests; those are tracked in the testing issue.
+In PowerShell, set `$env:GOOS = "js"` and `$env:GOARCH = "wasm"` before the build, then remove those environment variables afterward. This checks compatibility; the browser launcher and web controls are tracked separately in the web-version issue. Deterministic simulation tests run without a display. See [testing and manual checks](docs/TESTING.md), [project specification](docs/PROJECT_SPEC.md), [coding standards](docs/CODING_STANDARDS.md), and [agent workflow](AGENTS.md).
+
+Run the desktop app with `go run .`, or for example `go run . -width 1024 -height 768 -speed 30`. Startup dimensions must be 1..8192 pixels and speed must be 0..60; invalid settings fail with an error before asset/window initialization.
