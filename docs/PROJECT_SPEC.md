@@ -2,7 +2,7 @@
 
 ## Purpose and current scope
 
-A desktop Go/Ebitengine rover prototype with a scrolling background, horizontal movement and repeated jump boosts. Obstacles, scoring, fuel, a jump ceiling and win/loss objectives are future work. The current game starts immediately.
+A desktop and browser Go/Ebitengine rover prototype with a scrolling background, horizontal movement and repeated jump boosts. Obstacles, scoring, fuel, a jump ceiling and win/loss objectives are future work. The current game starts immediately.
 
 ## Architecture
 
@@ -30,3 +30,7 @@ The original scheduler steps only when its counter is strictly greater than TPS/
 ## Follow-up
 
 Issue #2 tracks a browser launcher, web controls for all command-line options, Cloudflare deployment and landing-page integration. A Wasm build alone does not complete it. Obstacles, score, fuel and physics improvements remain separate gameplay decisions.
+
+## Web implementation
+
+The browser version uses the same simulation and drawing code with platform-specific query arguments, ready reporting and on-screen input plus fixed logical viewport dimensions. The page launches immediately. All desktop flag values are exposed in validated settings; restart creates a fresh isolated iframe runtime. Rendering scales to the page while preserving the logical configuration. Browser Q is ignored. See BROWSER.md and DEPLOYMENT.md for implemented hosting and loader details; production verification and landing-page publication complete issue #2.

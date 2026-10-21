@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image/color"
 	"rover/assets"
+	"rover/internal/platform"
 	"rover/internal/simulation"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -89,7 +90,8 @@ func (g *GameData) Draw(screen *ebiten.Image) {
 }
 
 func (g *GameData) Update() error {
-	if inpututil.IsKeyJustPressed(ebiten.KeyQ) {
+	platform.Ready()
+	if !platform.Browser() && inpututil.IsKeyJustPressed(ebiten.KeyQ) {
 		return ebiten.Termination
 	}
 
@@ -117,12 +119,16 @@ func (g *GameData) Update() error {
 		g.GameSpeed = (max(g.GameSpeed-5, minSpeed))
 	}
 
-	g.State.Input(ebiten.IsKeyPressed(ebiten.KeyArrowLeft), ebiten.IsKeyPressed(ebiten.KeyArrowRight), inpututil.IsKeyJustPressed(ebiten.KeySpace))
+	left, right, jump := platform.Input()
+	g.State.Input(left || ebiten.IsKeyPressed(ebiten.KeyArrowLeft), right || ebiten.IsKeyPressed(ebiten.KeyArrowRight), jump || inpututil.IsKeyJustPressed(ebiten.KeySpace))
 	g.State.Update(ebiten.TPS())
 	return nil
 }
 
 func (g *GameData) Layout(width, height int) (int, int) {
+	if platform.Browser() {
+		return g.Width, g.Height
+	}
 	g.Width = width
 	g.Height = height
 	return g.Width, g.Height

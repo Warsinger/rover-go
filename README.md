@@ -59,6 +59,12 @@ A WebAssembly compilation check is also available:
 GOOS=js GOARCH=wasm go build -o build/game.wasm .
 ```
 
-In PowerShell, set `$env:GOOS = "js"` and `$env:GOARCH = "wasm"` before the build, then remove those environment variables afterward. This checks compatibility; the browser launcher and web controls are tracked separately in the web-version issue. Deterministic simulation tests run without a display. See [testing and manual checks](docs/TESTING.md), [project specification](docs/PROJECT_SPEC.md), [coding standards](docs/CODING_STANDARDS.md), and [agent workflow](AGENTS.md).
+In PowerShell, set `$env:GOOS = "js"` and `$env:GOARCH = "wasm"` before the build, then remove those environment variables afterward. This is the lower-level compilation check; the complete browser launcher is built with the command below. Deterministic simulation tests run without a display. See [testing and manual checks](docs/TESTING.md), [project specification](docs/PROJECT_SPEC.md), [coding standards](docs/CODING_STANDARDS.md), and [agent workflow](AGENTS.md).
 
 Run the desktop app with `go run .`, or for example `go run . -width 1024 -height 768 -speed 30`. Startup dimensions must be 1..8192 pixels and speed must be 0..60; invalid settings fail with an error before asset/window initialization.
+
+## Browser version
+
+Run `go run ./cmd/web -serve -port 8080` and open [localhost:8080](http://localhost:8080/). The game starts immediately; every command-line setting is also available on the page. Apply / restart creates a fresh run. Arrow keys / Space and on-screen buttons control the rover.
+
+The deployment target is [rovergo.pages.dev](https://rovergo.pages.dev/). See [browser behavior](docs/BROWSER.md) and [deployment/preview instructions](docs/DEPLOYMENT.md). Application icons are tracked separately in #8.
