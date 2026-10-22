@@ -67,4 +67,4 @@ Run the desktop app with `go run .`, or for example `go run . -width 1024 -heigh
 
 Run `go run ./cmd/web -serve -port 8080` and open [localhost:8080](http://localhost:8080/). The game starts immediately; every command-line setting is also available on the page. Apply / restart creates a fresh run. Arrow keys / Space and on-screen buttons control the rover.
 
-The deployment target is [rovergo.pages.dev](https://rovergo.pages.dev/). See [browser behavior](docs/BROWSER.md) and [deployment/preview instructions](docs/DEPLOYMENT.md). Application icons are tracked separately in #8.
+The deployment target is [rovergo.pages.dev](https://rovergo.pages.dev/). See [browser behavior](docs/BROWSER.md) and [deployment/preview instructions](docs/DEPLOYMENT.md). See [application icons](docs/ICONS.md) for artwork, regeneration and desktop support.
