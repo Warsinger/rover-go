@@ -3,3 +3,9 @@
 /bin/
 /*.exe
 /coverage.out
+
+# Operating-system metadata (at any directory depth)
+.DS_Store
+._*
+Thumbs.db
+desktop.ini
