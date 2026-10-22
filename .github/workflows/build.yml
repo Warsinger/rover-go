@@ -90,7 +90,7 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-      - run: npm ci --ignore-scripts
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: node --test scripts/*.test.mjs
       - run: go run ./cmd/web
       - run: node scripts/package-pages.mjs
