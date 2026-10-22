@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"rover/assets/icons"
 	"rover/game"
 	"rover/internal/platform"
 
@@ -10,6 +11,11 @@ import (
 )
 
 func main() {
+	windowIcons, err := icons.Images()
+	if err != nil {
+		log.Fatal(err)
+	}
+	ebiten.SetWindowIcon(windowIcons)
 	width := flag.Int("width", 800, "Board width in pixels")
 	height := flag.Int("height", 600, "Board height in pixels")
 	speed := flag.Int("speed", 30, "Ticks per second, min 0 max 60, + or - to adjust in game")

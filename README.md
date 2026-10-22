@@ -69,4 +69,4 @@ With Node 24+ installed, run `npm ci --ignore-scripts`, then `go run ./cmd/web -
 
 The browser launcher, Go/Wasm input/loading bridge and page styles come from [web-shared](https://github.com/Warsinger/web-shared). The exact shared revision and integrity hash are locked in `package-lock.json` and bundled locally with the app. Rover retains its settings, controls, content and colors. Native builds do not require Node or this browser dependency.
 
-The deployment target is [rovergo.pages.dev](https://rovergo.pages.dev/). See [browser behavior](docs/BROWSER.md) and [deployment/preview instructions](docs/DEPLOYMENT.md). Application icons are tracked separately in #8.
+The deployment target is [rovergo.pages.dev](https://rovergo.pages.dev/). See [browser behavior](docs/BROWSER.md) and [deployment/preview instructions](docs/DEPLOYMENT.md). See [application icons](docs/ICONS.md) for artwork, regeneration and desktop support.
