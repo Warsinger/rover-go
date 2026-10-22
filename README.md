@@ -65,6 +65,8 @@ Run the desktop app with `go run .`, or for example `go run . -width 1024 -heigh
 
 ## Browser version
 
-Run `go run ./cmd/web -serve -port 8080` and open [localhost:8080](http://localhost:8080/). The game starts immediately; every command-line setting is also available on the page. Apply / restart creates a fresh run. Arrow keys / Space and on-screen buttons control the rover.
+With Node 24+ installed, run `npm ci --ignore-scripts`, then `go run ./cmd/web -serve -port 8080` and open [localhost:8080](http://localhost:8080/). The game starts immediately; every command-line setting is also available on the page. Apply / restart creates a fresh run. Arrow keys / Space and on-screen buttons control the rover.
+
+The browser launcher, Go/Wasm input/loading bridge and page styles come from [web-shared](https://github.com/Warsinger/web-shared). The exact shared revision and integrity hash are locked in `package-lock.json` and bundled locally with the app. Rover retains its settings, controls, content and colors. Native builds do not require Node or this browser dependency.
 
 The deployment target is [rovergo.pages.dev](https://rovergo.pages.dev/). See [browser behavior](docs/BROWSER.md) and [deployment/preview instructions](docs/DEPLOYMENT.md). Application icons are tracked separately in #8.

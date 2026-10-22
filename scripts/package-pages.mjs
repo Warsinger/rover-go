@@ -5,13 +5,13 @@ import { gzipSync } from 'node:zlib';
 import { pathToFileURL } from 'node:url';
 
 export function packagePages(source, destination, revision = 'local') {
-  const names = ['game.html','launcher.js','options.mjs','game.js','styles.css','wasm_exec.js','game.wasm'];
+  const names = ['game.html','launcher.js','options.mjs','game.js','styles.css','shared/launcher.mjs','shared/go-runtime.mjs','shared/shell.css','wasm_exec.js','game.wasm'];
   const files = new Map(names.map(name => [name, fs.readFileSync(path.join(source,name))]));
   files.set('game.wasm.gz',gzipSync(files.get('game.wasm'),{level:9}));
   files.delete('game.wasm');
   const loader = files.get('game.js').toString();
-  if (!loader.includes('fetch("game.wasm")')) throw new Error('Wasm fetch reference missing');
-  files.set('game.js',Buffer.from(loader.replace('fetch("game.wasm")','fetch("game.wasm.gz")')));
+  if (!loader.includes("new URL('game.wasm', import.meta.url)")) throw new Error('Wasm fetch reference missing');
+  files.set('game.js',Buffer.from(loader.replace("new URL('game.wasm', import.meta.url)","new URL('game.wasm.gz', import.meta.url)")));
   const digest = crypto.createHash('sha256');
   for (const [name,content] of files) {
     if (content.length > 25 * 1024 * 1024) throw new Error(name + ' exceeds the Pages 25 MiB asset limit');
@@ -27,7 +27,10 @@ export function packagePages(source, destination, revision = 'local') {
   fs.mkdirSync(destination,{recursive:false});
   const assets = path.join(destination,'assets',hash);
   fs.mkdirSync(assets,{recursive:true});
-  for (const [name,content] of files) fs.writeFileSync(path.join(assets,name),content);
+  for (const [name,content] of files) {
+    fs.mkdirSync(path.dirname(path.join(assets,name)),{recursive:true});
+    fs.writeFileSync(path.join(assets,name),content);
+  }
   fs.writeFileSync(path.join(destination,'index.html'),index);
   fs.writeFileSync(path.join(destination,'404.html'),'<!doctype html><title>Not found</title><h1>Not found</h1><p>Open the application from its home page.</p>');
   fs.writeFileSync(path.join(destination,'_headers'),'/*\n  X-Content-Type-Options: nosniff\n/\n  Cache-Control: no-cache\n/index.html\n  Cache-Control: no-cache\n/version.json\n  Cache-Control: no-cache\n/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n/assets/'+hash+'/game.wasm.gz\n  Content-Type: application/gzip\n');

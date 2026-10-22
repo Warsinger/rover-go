@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "scripts": {
+    "test": "node --test scripts/*.test.mjs"
+  },
+  "dependencies": {
+    "@warsinger/web-shared": "https://codeload.github.com/Warsinger/web-shared/tar.gz/4407a1de4d534ff87a1a6f3607dfcf3881323450"
+  },
+  "type": "module",
+  "name": "rover-go-web"
+}
