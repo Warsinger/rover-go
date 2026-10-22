@@ -13,6 +13,7 @@ The reusable Warsinger/cloudflare-pages-deploy workflow validates the exact proj
 Build the upload directory locally with:
 
 ```sh
+npm ci --ignore-scripts
 go run ./cmd/web
 node scripts/package-pages.mjs build/pages
 ```
